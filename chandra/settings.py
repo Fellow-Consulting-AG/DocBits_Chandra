@@ -13,10 +13,10 @@ class Settings(BaseSettings):
     MIN_IMAGE_DIM: int = 1536
     MODEL_CHECKPOINT: str = "datalab-to/chandra"
     TORCH_DEVICE: str | None = None
-    MAX_OUTPUT_TOKENS: int = 12384
+    MAX_OUTPUT_TOKENS: int = 6000
     TORCH_ATTN: str | None = None
     BBOX_SCALE: int = 1024
-    USE_8BIT_QUANTIZATION: bool = True
+    USE_8BIT_QUANTIZATION: bool = False
 
     # vLLM server settings
     VLLM_API_KEY: str = "EMPTY"

@@ -77,10 +77,12 @@ def load_model():
     if settings.TORCH_DEVICE:
         device_map = {"": settings.TORCH_DEVICE}
 
-    # Use float32 on MPS to avoid numerical instability issues
+    # Use float32 on MPS, float16 on CUDA for better stability
     dtype = settings.TORCH_DTYPE
     if torch.backends.mps.is_available() and not settings.TORCH_DEVICE:
         dtype = torch.float32
+    elif torch.cuda.is_available():
+        dtype = torch.float16
 
     kwargs = {
         "device_map": device_map,
