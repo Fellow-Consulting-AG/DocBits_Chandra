@@ -90,9 +90,11 @@ def load_model():
     if settings.USE_8BIT_QUANTIZATION and torch.cuda.is_available():
         quantization_config = BitsAndBytesConfig(
             load_in_8bit=True,
-            bnb_4bit_compute_dtype=dtype,
+            llm_int8_threshold=6.0,
+            llm_int8_has_fp16_weight=False,
         )
         kwargs["quantization_config"] = quantization_config
+        kwargs["torch_dtype"] = torch.float16
     else:
         kwargs["dtype"] = dtype
 
