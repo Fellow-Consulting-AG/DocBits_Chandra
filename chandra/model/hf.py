@@ -87,7 +87,8 @@ def load_model():
 
     kwargs = {
         "device_map": device_map,
-        "max_memory": {0: "14GiB", "cpu": "30GiB"},  # Reserve memory, allow CPU offloading
+        "max_memory": {0: "12GiB", "cpu": "40GiB"},  # Reserve memory, allow CPU offloading
+        "offload_folder": "/tmp/chandra_offload",  # Explicit offload directory
     }
 
     # Add 8-bit quantization if enabled (reduces memory usage by ~50%)
