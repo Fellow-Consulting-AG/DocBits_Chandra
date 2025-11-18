@@ -78,17 +78,13 @@ def load_model():
     if settings.TORCH_DEVICE:
         device_map = {"": settings.TORCH_DEVICE}
 
-    # Use float32 on MPS, float16 on CUDA for better stability
-    dtype = settings.TORCH_DTYPE
-    if torch.backends.mps.is_available() and not settings.TORCH_DEVICE:
-        dtype = torch.float32
-    elif torch.cuda.is_available():
-        dtype = torch.float16
+    # Use float32 for numerical stability (float16/bfloat16 cause inf/nan errors)
+    dtype = torch.float32
 
     kwargs = {
         "device_map": device_map,
-        "max_memory": {0: "12GiB", "cpu": "40GiB"},  # Reserve memory, allow CPU offloading
-        "offload_folder": "/tmp/chandra_offload",  # Explicit offload directory
+        "max_memory": {0: "10GiB", "cpu": "40GiB"},  # Aggressive GPU limit, force CPU offloading
+        "offload_folder": "/tmp/chandra_offload",  # Disk offload for layers that don't fit
     }
 
     # Add 8-bit quantization if enabled (reduces memory usage by ~50%)
