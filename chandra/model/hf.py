@@ -83,8 +83,8 @@ def load_model():
 
     kwargs = {
         "device_map": device_map,
-        "max_memory": {0: "10GiB", "cpu": "40GiB"},  # Aggressive GPU limit, force CPU offloading
-        "offload_folder": "/tmp/chandra_offload",  # Disk offload for layers that don't fit
+        "max_memory": {0: "13GiB", "cpu": "60GiB"},  # Balance GPU and CPU, avoid disk offload
+        "offload_state_dict": True,  # Offload to CPU RAM instead of disk
     }
 
     # Add 8-bit quantization if enabled (reduces memory usage by ~50%)
