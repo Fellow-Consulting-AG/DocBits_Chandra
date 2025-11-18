@@ -73,6 +73,7 @@ def process_batch_element(item: BatchInputItem, processor, bbox_scale: int):
 def load_model():
     import torch
 
+    # Use CPU offloading for large models on limited GPU memory
     device_map = "auto"
     if settings.TORCH_DEVICE:
         device_map = {"": settings.TORCH_DEVICE}
@@ -86,6 +87,7 @@ def load_model():
 
     kwargs = {
         "device_map": device_map,
+        "max_memory": {0: "14GiB", "cpu": "30GiB"},  # Reserve memory, allow CPU offloading
     }
 
     # Add 8-bit quantization if enabled (reduces memory usage by ~50%)
