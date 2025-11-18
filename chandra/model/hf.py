@@ -62,7 +62,7 @@ def process_batch_element(item: BatchInputItem, processor, bbox_scale: int):
         prompt = PROMPT_MAPPING[prompt_type].replace("{bbox_scale}", str(bbox_scale))
 
     content = []
-    image = scale_to_fit(item.image, max_size=(2048, 1536))  # Reduce max size to save memory
+    image = scale_to_fit(item.image, max_size=(1536, 1024))  # Further reduce to save GPU memory during inference
     content.append({"type": "image", "image": image})
 
     content.append({"type": "text", "text": prompt})
@@ -83,7 +83,7 @@ def load_model():
 
     kwargs = {
         "device_map": device_map,
-        "max_memory": {0: "13GiB", "cpu": "60GiB"},  # Balance GPU and CPU, avoid disk offload
+        "max_memory": {0: "11GiB", "cpu": "60GiB"},  # Leave 4-5GB GPU for inference processing
         "offload_state_dict": True,  # Offload to CPU RAM instead of disk
     }
 
