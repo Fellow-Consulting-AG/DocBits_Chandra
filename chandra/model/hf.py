@@ -78,26 +78,26 @@ def load_model():
     if settings.TORCH_DEVICE:
         device_map = {"": settings.TORCH_DEVICE}
 
-    # Use float32 for numerical stability (float16/bfloat16 cause inf/nan errors)
-    dtype = torch.float32
-
     kwargs = {
         "device_map": device_map,
-        "max_memory": {0: "11GiB", "cpu": "60GiB"},  # Leave 4-5GB GPU for inference processing
-        "offload_state_dict": True,  # Offload to CPU RAM instead of disk
     }
 
     # Add 8-bit quantization if enabled (reduces memory usage by ~50%)
     if settings.USE_8BIT_QUANTIZATION and torch.cuda.is_available():
+        # Use 8-bit quantization with float32 compute for stability
         quantization_config = BitsAndBytesConfig(
             load_in_8bit=True,
             llm_int8_threshold=6.0,
             llm_int8_has_fp16_weight=False,
+            bnb_4bit_compute_dtype=torch.float32,  # Use float32 for computation stability
         )
         kwargs["quantization_config"] = quantization_config
-        kwargs["torch_dtype"] = torch.float16
+        kwargs["torch_dtype"] = torch.float32
     else:
-        kwargs["dtype"] = dtype
+        # Use float32 for numerical stability without quantization
+        kwargs["dtype"] = torch.float32
+        kwargs["max_memory"] = {0: "11GiB", "cpu": "60GiB"}
+        kwargs["offload_state_dict"] = True
 
     if settings.TORCH_ATTN:
         kwargs["attn_implementation"] = settings.TORCH_ATTN
