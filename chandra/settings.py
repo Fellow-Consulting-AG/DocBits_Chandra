@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     MAX_OUTPUT_TOKENS: int = 12384
     TORCH_ATTN: str | None = None
     BBOX_SCALE: int = 1024
+    USE_8BIT_QUANTIZATION: bool = True
 
     # vLLM server settings
     VLLM_API_KEY: str = "EMPTY"

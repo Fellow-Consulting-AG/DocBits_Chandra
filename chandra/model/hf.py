@@ -1,7 +1,7 @@
 from typing import List
 
 from qwen_vl_utils import process_vision_info
-from transformers import Qwen3VLForConditionalGeneration, Qwen3VLProcessor
+from transformers import Qwen3VLForConditionalGeneration, Qwen3VLProcessor, BitsAndBytesConfig
 
 from chandra.model.schema import BatchInputItem, GenerationResult
 from chandra.model.util import scale_to_fit
@@ -62,7 +62,7 @@ def process_batch_element(item: BatchInputItem, processor, bbox_scale: int):
         prompt = PROMPT_MAPPING[prompt_type].replace("{bbox_scale}", str(bbox_scale))
 
     content = []
-    image = scale_to_fit(item.image)  # Guarantee max size
+    image = scale_to_fit(item.image, max_size=(2048, 1536))  # Reduce max size to save memory
     content.append({"type": "image", "image": image})
 
     content.append({"type": "text", "text": prompt})
@@ -71,14 +71,31 @@ def process_batch_element(item: BatchInputItem, processor, bbox_scale: int):
 
 
 def load_model():
+    import torch
+
     device_map = "auto"
     if settings.TORCH_DEVICE:
         device_map = {"": settings.TORCH_DEVICE}
 
+    # Use float32 on MPS to avoid numerical instability issues
+    dtype = settings.TORCH_DTYPE
+    if torch.backends.mps.is_available() and not settings.TORCH_DEVICE:
+        dtype = torch.float32
+
     kwargs = {
-        "dtype": settings.TORCH_DTYPE,
         "device_map": device_map,
     }
+
+    # Add 8-bit quantization if enabled (reduces memory usage by ~50%)
+    if settings.USE_8BIT_QUANTIZATION and torch.cuda.is_available():
+        quantization_config = BitsAndBytesConfig(
+            load_in_8bit=True,
+            bnb_4bit_compute_dtype=dtype,
+        )
+        kwargs["quantization_config"] = quantization_config
+    else:
+        kwargs["dtype"] = dtype
+
     if settings.TORCH_ATTN:
         kwargs["attn_implementation"] = settings.TORCH_ATTN
 
