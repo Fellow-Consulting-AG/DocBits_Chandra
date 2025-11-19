@@ -1,0 +1,33 @@
+{
+  "file_name": "einvoicing_rechnung_0650810352 (1).pdf",
+  "num_pages": 2,
+  "total_token_count": 2264,
+  "total_chunks": 30,
+  "total_images": 1,
+  "pages": [
+    {
+      "page_num": 0,
+      "page_box": [
+        0,
+        0,
+        1587,
+        2246
+      ],
+      "token_count": 1762,
+      "num_chunks": 20,
+      "num_images": 1
+    },
+    {
+      "page_num": 1,
+      "page_box": [
+        0,
+        0,
+        1587,
+        2246
+      ],
+      "token_count": 502,
+      "num_chunks": 10,
+      "num_images": 0
+    }
+  ]
+}
