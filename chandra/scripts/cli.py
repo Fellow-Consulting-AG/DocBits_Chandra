@@ -82,6 +82,7 @@ def save_merged_output(
             "token_count": result.token_count,
             "num_chunks": len(result.chunks),
             "num_images": len(result.images),
+            "chunks": result.chunks,
         }
         all_metadata.append(page_metadata)
 
